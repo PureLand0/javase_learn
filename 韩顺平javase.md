@@ -542,12 +542,66 @@ constructor的目的是对对象**进行init，而不是创建对象**，换言�
 - jvm自动调用，即不可以通过手动调用
 - 如果程序员没有定义构造器，系统其实会有一个默认的无参构造器    Dog(){}
 - 一旦自己定义了构造器，默认的无参构造器就会失效，所以一般建议自己再显示定义一个无参构造器
-- constructor的修饰符可以是那四个 但是**建议使用默认修饰符** 因为系统的默认构造器就是使用的默认修饰符
+- constructor的修饰符可以是那四个 **建议使用public** 
 
 ![image-20241014153747835](韩顺平javase.assets/image-20241014153747835.png)
 
 ## 5.7、this
 
+this：表示当前对象。（即哪个对象正在调用，那么this就是哪个对象）
+
+```java
+class Dog{
+    private String name;
+    private int age;
+
+    public Dog(String name, int age) {
+        this.name = name;
+        左边的name有this修饰表示的是成员变量 右边的name根据“就近原则”是传入的局部变量
+        this.age = age;
+    }
+
+    public void test() {
+        在main中调用这个方法时 this指代的是调用这个方法的对象 所以打印的hash和main中对象自己hash一致
+        System.out.println("this的hash"+this.hashCode());
+    }
+}
+```
+
+使用细节：
+
+- 在成员方法f2中想要调用成员方法f1，第一种方法直接写f1(); 第二种方法是写this.f1()
+- 在构造器1中想运行构造器2，可以使用如下的语法格式，**而且这句话必须放在第一行**，这种方法只能在构造器之间互相使用，不可以和普通成员方法混用
+
+```java
+public Dog() {
+    this("ss",10);在这里会调用构造器2 中间没有. 原因很简单 构造器是不能够人为调用的 所以不能用.
+    System.out.println("构造器1被调用");
+}
+
+public Dog(String name, int age) {
+    this.name = name;
+    this.age = age;
+    System.out.println("构造器2被调用");
+}
+```
+
+
+
+# 6、OOP三大特点
+
+## 6.1、IDEA快捷键
+
+```
+ctrl+/：注释
+ctrl+d：删除当前行
+ctrl+alt+下箭头：向下复制改行
+alt+enter：自动导包
+ctrl+alt+F：格式化代码
+ctrl+H：查看继承关系
+ctrl+B：查看源代码
+new对象.var：自动添加对象名称
+```
 
 
 
@@ -561,12 +615,7 @@ constructor的目的是对对象**进行init，而不是创建对象**，换言�
 
 
 
-
-
-
-
-
-# 6、递归（略）
+# 7、递归（略）
 
 
 
