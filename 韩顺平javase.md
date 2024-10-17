@@ -739,7 +739,164 @@ Dog a2 = new Dog();
 
 那a2自然而然可以使用子类的所有成员变量/成员方法，跟基础部分一致。
 
-在这里提一嘴一个特殊的运算符：instanceof
+在这里提一嘴一个特殊的运算符：instanceof，用于判断一个对象的运行类型是不是一个某个类或者某个类的子类。
+
+```java
+Animal animal = new Dog();
+System.out.println(animal instanceof Animal);true
+System.out.println(animal instanceof Dog);true
+System.out.println(animal instanceof Cat);false
+```
+
+### 6.7.3、动态绑定机制（重要）
+
+- 成员方法有动态绑定机制：与运行类型相互绑定
+- 成员变量没有动态绑定机制：哪个近用哪个
+
+demo01：Animal a = new Dog();调用a.test()，运行的子类的test方法，a是20
+
+```java
+class Animal{
+    int a = 10;
+    public void test() {
+        System.out.println(a);
+    }
+}
+class Dog extends Animal{
+    int a = 20;
+    public void test() {
+        System.out.println(a);
+    }
+}
+```
+
+demo02：Animal a = new Dog()，调用a.test()，运行的父类的test方法，a是10
+
+```java
+class Animal{
+    int a = 10;
+    public void test() {
+        System.out.println(a);
+    }
+}
+class Dog extends Animal{
+    int a = 20;
+}
+```
+
+demo03：Animal a = new Dog()，调用a.test()，运行的父类的test方法，a是10
+
+```java
+class Animal{
+    int a = 10;
+    public void test() {
+        System.out.println(a);
+    }
+}
+class Dog extends Animal{
+    public void test() {
+        System.out.println(a);
+    }
+}
+```
+
+### 6.7.4、多态应用——多态数组
+
+每个都相当于是向上转型。下面的形式也是一般情况下类数组的表现形式，即两次new。
+
+```java
+Animal[] animals = new Animal[5];
+animals[0] = new Dog();
+animals[1] = new Cat();
+animals[2] = new Dog();
+animals[3] = new Cat();
+animals[4] = new Dog();
+```
+
+### 6.7.5、多态应用——多态参数
+
+成员方法的形参为父类，实参可以传入子类。实际上是向上转型。
+
+
+
+## 6.8、Object
+
+Object中有很多方法，因为是所有类的父类，所以所有的类都可以使用这些方法。下面我们挑几个讲解一下：equals、hashCode、toString、finalize
+
+讲equals前先介绍一下==比较符：
+
+- 既可以比较基本数据类型， 也可以比较引用类型
+- 如果是基本数据类型，那么就比较值是否相等
+- 如何是引用类型，那么就比较地址是否相等（即是否指向的是同一个对象）
+
+
+
+下面介绍一下Object里面的equals方法：
+
+![image-20241016150223023](韩顺平javase.assets/image-20241016150223023.png)
+
+其只可以用于引用数据类型，可以看到他默认是使用了==符，默认判断两个对象的地址是不是一样。
+
+但是他的子类一般都override这个方法，用来比较两个类的值是否相等，比如String、Integer就override了。
+
+
+
+hashCode：将对象的地址hash一下后返回，返回为int类型。使用方法：对象.hashCode()
+
+
+
+toString()：默认返回对象的全类名（包名+类名） + @ + hash码的16进制，返回字符串类型
+
+![image-20241016154233854](韩顺平javase.assets/image-20241016154233854.png)
+
+子类一般会override这个方法。一般，print对象的时候，本质上就是调用了toString方法，即下面2个结果一样
+
+```java
+System.out.println(cat);
+System.out.println(cat.toString());
+```
+
+
+
+finalize()：当一个对象的引用数目=0的时候，说明其变成了一个垃圾，这个时候jvm会调用对象的finalize，进行垃圾回收。所以可以在子类override该方法时，写入一些回收资源的操作。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
