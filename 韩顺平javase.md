@@ -630,6 +630,8 @@ new对象.var：自动添加对象名称
 - constructor
 - 如果set和get方法有校验数据的逻辑，constructor可能会成为一个漏洞，所以这个时候建议将constructor和set、get结合起来
 
+
+
 ## 6.5、继承
 
 ```java
@@ -707,7 +709,7 @@ Animal a1 = new Dog();
 a1 = new Cat();
 ```
 
-多态的前提：2个类之间存在继承关系。在我眼里，多态其实就两个：向上转型与向下转型。
+多态的前提：2个类之间存在继承关系。多态是建立在封装和继承之上的。在我眼里，多态其实就两个：向上转型与向下转型，当然，重载和重写也算是多态的表现。
 
 ### 6.7.1、向上转型
 
@@ -784,7 +786,7 @@ class Dog extends Animal{
 }
 ```
 
-demo03：Animal a = new Dog()，调用a.test()，运行的父类的test方法，a是10
+demo03：Animal a = new Dog()，调用a.test()，运行的子类的test方法，a是10
 
 ```java
 class Animal{
@@ -796,6 +798,24 @@ class Animal{
 class Dog extends Animal{
     public void test() {
         System.out.println(a);
+    }
+}
+```
+
+demo04（典型）：Animal a = new Cat()，调用a.test()，运行父类的test方法，然后运行子类的test02方法，输出2
+
+```java
+class Animal {
+    public void test() {
+        test02();
+    }
+    public void test02() {
+        System.out.println(1);
+    }
+}
+class Cat extends Animal {
+    public void test02() {
+        System.out.println(2);
     }
 }
 ```
@@ -821,7 +841,7 @@ animals[4] = new Dog();
 
 ## 6.8、Object
 
-Object中有很多方法，因为是所有类的父类，所以所有的类都可以使用这些方法。下面我们挑几个讲解一下：equals、hashCode、toString、finalize
+Object中有很多方法，因为是所有类的父类，所以所有的类都可以使用这些方法。下面我们挑4个讲解一下：equals、hashCode、toString、finalize
 
 讲equals前先介绍一下==比较符：
 
