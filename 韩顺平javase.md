@@ -1072,6 +1072,7 @@ abstract class Animal{
 - 抽象方法不可以实现，不能写{}
 - 如果一个类**继承**了抽象类，那么他必须**实现（override）**这个抽象类的**所有**抽象方法，除非他自己也声明自己是一个抽象类
 - 抽象方法不可以使用private、static、final修饰，这和override违背，建议使用public
+- 抽象类是对继承的进一步抽象，所以也是有向上转型、向下转型的
 
 
 
@@ -1161,11 +1162,11 @@ public class test {
         usb.fun1();
         usb.fun2(); usb接口有2个抽象方法 Phone里面一定实现了 直接调用
             
-        if (usb instanceof Phone) {想要使用Phone的专有方法 向下转型
+        if (usb instanceof Phone) {想要使用Phone的专有方法 只能向下转型
             Phone phone = (Phone) usb;
             phone.phoneFun();
         }
-        if (usb instanceof Camera) {想要使用Camera的专有方法 向下转型
+        if (usb instanceof Camera) {想要使用Camera的专有方法 只能向下转型
             Camera camera = (Camera) usb;
             camera.cameraFun();
         }
@@ -1195,7 +1196,194 @@ class Phone implements USB2 {
 
 # 8、内部类、枚举、注解、异常
 
-## 8.1、四大内部类（还没看）
+## 8.1、四大内部类
+
+![image-20241024103945918](韩顺平javase.assets/image-20241024103945918.png)
+
+类有5大成员：成员变量、成员方法、构造器、代码块、内部类
+
+分类如下：
+
+![image-20241024104354329](韩顺平javase.assets/image-20241024104354329.png)
+
+
+
+### 局部内部类
+
+```java
+class Outer {//这是外部类
+    //私有成员变量
+    private int age = 10;
+    //私有成员方法
+    private void fun1() {
+        System.out.println("这是外部类的私有方法");
+    }
+	//成员方法
+    public void fun2() {
+        //下面是局部内部类 定义在外部类的局部位置(方法内或者代码块之内)
+        //局部内部类地位相当于一个局部变量 所以跟局部变量一样不可以使用访问修饰符
+        //局部内部类可以使用final修饰 即本身可被继承 加了之后不可继承
+        //作用域：定义他的方法之中
+        //本质还是一个类 所以类有的他一般也有
+        
+        class Inner {
+            public void fun3() {
+                System.out.println("这是内部类的方法");
+                //局部内部类最大的特点在于可访问外部类的私有成员
+                System.out.println(age);
+                //如果局部内部类也有一个变量叫age，那么这里在调用的时候遵循就近原则，如果就是想要使用外					部类的age，可以使用fun2.this.age来调用，其中fun2.this表示创造这个内部类的外部类对				   象
+                //方法同理，如果局部内部类里面有个方法和外部类一个方法重名，在这里调用的时候遵循就近原				  则，如果就是想要使用外部类的方法，可以使用fun2.this.方法 来调用
+                fun1();
+            }
+        }
+        
+        //局部内部类的用法：在作用域内新建即可
+        Inner inner = new Inner();
+        inner.fun3();
+    }
+}
+```
+
+### 匿名内部类（最vital）
+
+```java
+class Outer {
+	//外部类的成员方法
+    public void fun1() {
+        //下面就是一个（基于接口）的匿名内部类，定义在外部类的局部位置(方法内或者代码块之内)
+        //tiger的编译类型：Animal;运行类型：底层会自动创建一个类，实现Animal接口，然后new这个类，把对			  象返回，这个新类里面的内容就是下面的{}中的
+        Animal tiger = new Animal() {
+            @Override
+            public void cry() {
+                System.out.println("老虎叫");
+            }
+        };    //;别忘掉
+        
+        //使用：然后可以正常调用这个匿名内部类的方法
+        tiger.cry();
+        
+        //下面是另一个（基于类）的匿名内部类
+        //parrot的编译类型：Bird；运行类型：底层会自动创建一个类，继承Bird，然后new这个类，把对			  象返回，这个新类里面的内容就是下面的{}中的
+        //这里传入参数会自动调用父类的构造器
+        Bird parrot = new Bird("mzz"){
+            @Override
+            public void eat() {
+                System.out.println();
+            }
+        };
+        
+    }
+}
+//这是一个接口
+interface Animal {
+    public void cry();
+}
+//这是一个类
+class Bird {
+    private String name;
+    public Bird(String name){
+        this.name = name;
+    }
+    public void eat() {
+        System.out.println(1);
+    }
+}
+```
+
+- 匿名内部类可以访问外部类的私有成员
+- 同局部内部类一样，匿名内部类的地位就是一个局部变量，所以不可以加访问修饰符
+- 如果匿名内部类有一个成员变量和外部类的成员变量重名，那么这里在调用的时候遵循就近原则，如果就是想要使用外部类的成员变量，可以使用 外部类名.this.变量名 来调用，其中外部类名.this表示创造这个内部类的外部类对象
+- 方法同理，如果匿名内部类里面有个方法和外部类一个方法重名，在这里调用的时候遵循就近原则，如果就是想要使用外部类的方法，可以使用 外部类名.this.变量名 来调用
+- 使用匿名内部类的最佳实践：将匿名内部类对象当成一个实参传递     
+- **匿名内部类既定义了类的结构，同时他本身也是一个对象**
+
+
+
+### 成员内部类
+
+```java
+class Outer {
+    private int age = 10;
+    //下面就是一个成员内部类的例子
+    class Inner {
+        public void fun2() {       
+        } 
+    }
+    
+    public void fun1() {
+        Inner inner = new Inner();
+        inner.fun2();
+    }
+
+}
+```
+
+- 成员内部类的位置：和外部类的成员变量/方法持平
+
+- 可以使用四种修饰符
+
+- 一般使用：在外部类的另一个方法中新建内部类对象，然后调用内部类的方法
+
+- 在外部其他类也可以使用内部类，有2种方法
+
+  ```java
+  //方式1：
+  Outer outer = new Outer();
+  Outer.Inner inner = outer.new Inner();
+  //方式2：
+  在外部类中建立一个返回内部类实例的方法，直接返回
+  ```
+
+- 如果内部类有一个成员变量和外部类的成员变量重名，那么这里在调用的时候遵循就近原则，如果就是想要使用外部类的成员变量，可以使用 外部类名.this.变量名 来调用，其中外部类名.this表示创造这个内部类的外部类对象
+
+- 方法同理，如果内部类里面有个方法和外部类一个方法重名，在这里调用的时候遵循就近原则，如果就是想要使用外部类的方法，可以使用 外部类名.this.变量名 来调用
+
+
+
+### 静态内部类
+
+```java
+class Outer {
+    private static int age = 10;
+
+    static class Inner {
+        public void fun2() {
+            System.out.println(age);
+        }
+
+    }
+    
+    public void fun1() {
+        Inner inner = new Inner();
+        inner.fun2();
+    }
+
+}
+```
+
+- 静态内部类的位置：和外部类的成员变量/方法持平
+
+- 可以使用四种修饰符
+
+- 可以直接访问外部类的静态成员，不能访问非静态成员
+
+- 使用static修饰：这是static第一次修饰class
+
+- 一般使用：在外部类的另一个方法中新建内部类对象，然后调用内部类的方法
+
+- 在外部其他类也可以使用内部类，有2种方法
+
+  ```java
+  //方式1：
+  Outer.Inner inner = new Outer.Inner();
+  //方式2：
+  在外部类中建立一个返回内部类实例的方法，直接返回
+  ```
+
+- 如果内部类有一个成员变量和外部类的成员变量重名，那么这里在调用的时候遵循就近原则，如果就是想要使用外部类的成员变量，可以使用 外部类名.变量名 来调用，这里和前面三个不一样，因为能在内部类使用的一定是静态的
+- 成员方法同理
+
+
 
 ## 8.2、枚举类enum
 
@@ -1213,6 +1401,7 @@ class Season {
     public static final Season SUMMER = new Season("夏天","炎热");
     public static final Season AUTUMN = new Season("秋天","凉爽");
     public static final Season WINTER = new Season("冬天","寒冷");
+    
 	第1步：把构造器换成private
     private Season(String name, String desc) {
         this.name = name;
@@ -1278,16 +1467,17 @@ enum Season {更改1：class变enum
       System.out.println(season);				SPRING、SUMMER、AUTUMN、WINTER
   }
   Season season = Season.valueOf("SPRING");
-  System.out.println(Season.SPRING.compareTo(Season.SUMMER));-1（SPRING-SUMMER）
+  System.out.println(Season.SPRING.compareTo(Season.SUMMER));  -1（SPRING-SUMMER）
   ```
 
+- 枚举可以使用switch语句，（）内写自己建立的枚举对象，case后面写enum中定义的枚举名
 
 
 ## 8.3、注解3
 
 - @override
 - @Deprecated：修饰某个类、成员变量、成员方法，表示已经过时，过时还是可以用的，只是不推荐
-- @SuppressWarnings({"all","xxx","xxx"}}：表示抑制某种类型的warning，可以修饰类和方法
+- @SuppressWarnings({"all","xxx","xxx"}}：表示抑制某种类型的warning，可以修饰类和方法，传入str数组
 
 ## 8.4、异常
 
@@ -1320,7 +1510,7 @@ enum Season {更改1：class变enum
 饿汉式：
 
 - 构造器私有化，防止new
-- 在类的内部创建该对象，静态
+- 在类的内部创建该对象，静态（因为在getInstance这个静态方法中要使用）
 - 向外提供一个公共的静态方法 getInstance
 
 ```java
